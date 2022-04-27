@@ -1,8 +1,8 @@
 import {Status} from "./Statuses";
 
 export interface IMessagesQueue {
+  messages: string;
   addMessage: (id: string, status: Status, message: any) => void;
-  getMessages: () => string;
 }
 
 export interface IMessage {
@@ -14,13 +14,13 @@ export interface IMessage {
 export class MessagesQueue implements IMessagesQueue {
   private queue: IMessage[] = [];
 
-  public addMessage(id: string, status: Status, message: any) {
-    this.queue.push({id, status, payload: message});
-  }
-
-  public getMessages() {
+  public get messages() {
     const temp = [...this.queue];
     this.queue = [];
     return JSON.stringify(temp);
+  }
+
+  public addMessage(id: string, status: Status, message: any) {
+    this.queue.push({id, status, payload: message});
   }
 }

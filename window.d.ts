@@ -4,7 +4,7 @@ import {TransactionHandler} from "./src/TransactionHandler";
 
 declare global {
   interface Window {
-    web3: Web3;
+    ethereum: any;
     messageQueue: IMessagesQueue;
     transactionHandler: TransactionHandler
   }
