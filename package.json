@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --mode=production"
+    "build": "webpack --mode=production",
+    "dev-build": "webpack --mode=development"
   },
   "author": "",
   "license": "ISC",
@@ -14,10 +15,12 @@
   },
   "devDependencies": {
     "assert": "^2.0.0",
+    "buffer": "^6.0.3",
     "copy-webpack-plugin": "^10.2.4",
     "crypto-browserify": "^3.12.0",
     "https-browserify": "^1.0.0",
     "os-browserify": "^0.3.0",
+    "process": "0.11.10",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "ts-loader": "^8.2.0",

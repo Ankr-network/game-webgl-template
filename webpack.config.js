@@ -22,7 +22,8 @@ module.exports = {
       "http": require.resolve("stream-http"),
       "https": require.resolve("https-browserify"),
       "os": require.resolve("os-browserify"),
-      "url": require.resolve("url")
+      "url": require.resolve("url"),
+      "buffer": require.resolve("buffer")
     }
   },
   output: {
@@ -35,8 +36,12 @@ module.exports = {
         { from: "static" },
       ],
     }),
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-    })
+    new webpack.ProvidePlugin({
+      process: 'process/browser'
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
   ],
+  devtool: 'inline-source-map',
 };

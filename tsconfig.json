@@ -15,7 +15,8 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "baseUrl": "src",
-    "typeRoots": ["./*.d.ts", "./node_modules/@types"]
+    "typeRoots": ["./*.d.ts", "./node_modules/@types"],
+    "sourceMap": true
   },
   "include": ["src", "./*.d.ts"]
 }
