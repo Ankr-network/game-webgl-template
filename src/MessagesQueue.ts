@@ -21,6 +21,6 @@ export class MessagesQueue implements IMessagesQueue {
   }
 
   public addMessage(id: string, status: Status, message: any) {
-    this.queue.push({id, status, payload: message});
+    this.queue.push({id, status, payload: typeof message === 'string' ? message : JSON.stringify(message)});
   }
 }

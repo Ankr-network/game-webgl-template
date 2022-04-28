@@ -9,3 +9,9 @@ export interface TransactionData
   nonce: number;
   chainId: number;
 }
+
+export interface DataSignaturePropsDTO {
+  address: string;
+  message: string;
+  password?: string;
+}

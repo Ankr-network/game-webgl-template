@@ -1,23 +1,25 @@
 import Web3 from "web3";
 import {IMessagesQueue} from "./MessagesQueue";
-import {Status} from "./Statuses";
-import {TransactionData} from "./interfaces";
+import {DataSignaturePropsDTO, TransactionData} from "./interfaces";
 import detectEthereumProvider from '@metamask/detect-provider';
+import {ExternalMethod} from "./ExternalMethodDecorator";
 
 
 interface ITransactionHandler {
-  signMessage: (id: string, payload: string) => void;
-  sendTransaction: (id: string, payload: string) => void;
+  signMessage: (payload: DataSignaturePropsDTO) => void;
+  sendTransaction: (payload: TransactionData) => void;
 }
 
 export class TransactionHandler implements ITransactionHandler {
   private web3: Web3;
+  private provider: any;
   private mq: IMessagesQueue;
 
   constructor(messageQueue: IMessagesQueue) {
     detectEthereumProvider()
       .then((provider: any) => {
         this.web3 = new Web3(provider);
+        this.provider = provider;
       })
       .catch(() => {
         throw new Error("There is no any providers");
@@ -25,46 +27,49 @@ export class TransactionHandler implements ITransactionHandler {
     this.mq = messageQueue;
   }
 
-  public async signMessage(id: string, payload: string) {
-    const message = payload;
+  @ExternalMethod()
+  public async signMessage(payload: DataSignaturePropsDTO) {
+    const {address, message, password = ""} = payload;
     try {
-      const from = (await this.web3.eth.getAccounts())[0];
-      const signature = await this.web3.eth.personal.sign(message, from, "");
-      this.mq.addMessage(id, Status.Success, signature);
-    } catch (error) {
-      this.mq.addMessage(id, Status.Error, error.message);
+      return await this.web3.eth.personal.sign(message, address, password);
+    } catch(error) {
+        throw error;
     }
   };
 
-
-  public async sendTransaction(id: string, payload: string) {
-    const {from, to, value, gas, gasPrice, data, chainId, nonce} = JSON.parse(payload) as TransactionData;
-
-    this.web3.eth
-      .sendTransaction({
-        from,
-        to,
-        value,
-        gas: gas ? gas : undefined,
-        gasPrice: gasPrice ? gasPrice : undefined,
-        data,
-        chainId,
-        nonce
-      })
-      .on("transactionHash", (transactionHash) => {
-        this.mq.addMessage(id, Status.Success, transactionHash);
-      })
-      .on("error", (error) => {
-        this.mq.addMessage(id, Status.Error, error.message);
-      });
+  @ExternalMethod()
+  public sendTransaction(payload: TransactionData) {
+    const {from, to, value, gas, gasPrice, data, chainId, nonce} = payload;
+    return new Promise((resolve, reject) => {
+      this.web3.eth
+        .sendTransaction({
+          from,
+          to,
+          value,
+          gas: gas ? gas : undefined,
+          gasPrice: gasPrice ? gasPrice : undefined,
+          data,
+          chainId,
+          nonce
+        })
+        .on("transactionHash", (transactionHash) => {
+          resolve(transactionHash);
+        })
+        .on("error", (error) => {
+          reject(error);
+        });
+    });
   }
 
+  @ExternalMethod()
   public async getAccounts(id: string) {
+    const request = this.provider.selectedAddress ? 'eth_accounts' : 'eth_requestAccounts';
+
     try {
-      const addresses = await (await this.web3.eth.getAccounts())[0];
-      this.mq.addMessage(id, Status.Success, JSON.stringify(addresses));
+      const addresses = await this.provider.request({method: request});
+      return addresses;
     } catch (error) {
-      this.mq.addMessage(id, Status.Error, error.message);
+      throw error;
     }
   }
 

@@ -4,5 +4,5 @@ import {TransactionHandler} from "./TransactionHandler";
 const messageQueue = new MessagesQueue();
 const transactionHandler = new TransactionHandler(messageQueue);
 
-window.messageQueue = messageQueue;
+window.MQ = messageQueue;
 window.transactionHandler = transactionHandler;

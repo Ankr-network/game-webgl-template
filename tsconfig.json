@@ -16,7 +16,8 @@
     "jsx": "react-jsx",
     "baseUrl": "src",
     "typeRoots": ["./*.d.ts", "./node_modules/@types"],
-    "sourceMap": true
+    "sourceMap": true,
+    "experimentalDecorators": true
   },
   "include": ["src", "./*.d.ts"]
 }
