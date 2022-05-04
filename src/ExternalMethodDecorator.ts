@@ -1,13 +1,13 @@
 import {Status} from "./Statuses";
 
-export function ExternalMethod(isString?: boolean) {
+export function ExternalMethod() {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value!;
 
     descriptor.value = function(id: string, payload: string) {
-      let prop = payload;
-      if(payload && !isString) {
-        prop = JSON.parse(payload);
+      let prop = null;
+      if(payload) {
+        prop = tryToParseOrReturnString(payload);
       }
 
       try {
@@ -27,3 +27,11 @@ export function ExternalMethod(isString?: boolean) {
     return descriptor as typeof target;
   };
 }
+
+const tryToParseOrReturnString = (payload: string): any => {
+  try {
+    return JSON.parse(payload);
+  } catch (e) {
+    return payload;
+  }
+};

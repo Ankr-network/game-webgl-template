@@ -15,9 +15,13 @@ export class MessagesQueue implements IMessagesQueue {
   private queue: IMessage[] = [];
 
   public get messages() {
-    const temp = [...this.queue];
-    this.queue = [];
-    return JSON.stringify(temp);
+    if(this.queue.length > 0) {
+      const temp = [...this.queue];
+      this.queue = [];
+      return JSON.stringify(temp);
+    } else {
+      return "";
+    }
   }
 
   public addMessage(id: string, status: Status, message: any) {
