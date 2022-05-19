@@ -1,8 +1,10 @@
 import Web3 from "web3";
 import {IMessagesQueue} from "./MessagesQueue";
-import {DataSignaturePropsDTO, TransactionData} from "./interfaces";
+import {DataSignaturePropsDTO, IEthereumChain, TransactionData} from "./interfaces";
 import detectEthereumProvider from '@metamask/detect-provider';
 import {ExternalMethod} from "./ExternalMethodDecorator";
+
+const CHAIN_HAS_NOT_BEEN_ADDED_CODE = 4902;
 
 export class TransactionHandler {
   private web3: Web3;
@@ -52,6 +54,12 @@ export class TransactionHandler {
   }
 
   @ExternalMethod()
+  public async getContractData(payload: TransactionData) {
+    delete payload.chainId;
+    return await this.provider.request({method: "eth_call", params: [payload, "latest"]});
+  }
+
+  @ExternalMethod()
   public async estimateGas(payload: TransactionData) {
     delete payload.chainId;
     return await this.web3.eth.estimateGas(payload);
@@ -80,6 +88,33 @@ export class TransactionHandler {
         }
       }
       resolve(receipt);
+    });
+  }
+
+  @ExternalMethod()
+  public async switchChain(payload: IEthereumChain) {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        await this.provider.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{chainId: payload.chainId}],
+        });
+        resolve();
+      } catch (switchError) {
+        if ((switchError as any).code === CHAIN_HAS_NOT_BEEN_ADDED_CODE) {
+          try {
+            await this.provider.request({
+              method: 'wallet_addEthereumChain',
+              params: [payload],
+            });
+            resolve();
+          } catch (addError) {
+            reject((addError as Error).message);
+          }
+        } else {
+          reject((switchError as Error).message);
+        }
+      }
     });
   }
 
