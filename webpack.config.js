@@ -2,7 +2,7 @@ const path = require('path');
 const CopyPlugin = require("copy-webpack-plugin");
 const webpack = require('webpack');
 
-module.exports = {
+const config = {
   entry: './src/index.ts',
   module: {
     rules: [
@@ -26,16 +26,7 @@ module.exports = {
       "buffer": require.resolve("buffer")
     }
   },
-  output: {
-    filename: 'ankr-web3-template/js/ankr-web3.js',
-    path: path.resolve(__dirname, 'dist'),
-  },
   plugins: [
-    new CopyPlugin({
-      patterns: [
-        { from: "static" },
-      ],
-    }),
     new webpack.ProvidePlugin({
       process: 'process/browser'
     }),
@@ -45,3 +36,42 @@ module.exports = {
   ],
   devtool: 'inline-source-map',
 };
+
+var template2019Config = Object.assign({}, config, {
+  output: {
+    filename: 'ankr-web3-template-2019/js/ankr-web3.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        { from: "static/ankr-web3-template-2019", to: "ankr-web3-template-2019" },
+      ],
+    })
+  ]
+});
+var template2020Config = Object.assign({}, config,{
+  output: {
+    filename: 'ankr-web3-template-2020/js/ankr-web3.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        { from: "static/ankr-web3-template-2020", to: "ankr-web3-template-2020" },
+      ],
+    })
+  ],
+});
+var library = Object.assign({}, config,{
+  output: {
+    filename: 'lib/ankr-web3.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+});
+
+module.exports = [
+  template2019Config,
+  template2020Config,
+  library
+];
