@@ -118,6 +118,11 @@ export class TransactionHandler {
     });
   }
 
+  @ExternalMethod()
+  public async getEvents(payload: any) {
+    return await this.provider.request({method: "eth_getLogs", params: [payload]});
+  }
+
   private getReceipt(transactionHash: string) {
     return this.provider.request({method: "eth_getTransactionReceipt", params: [transactionHash]});
   }
