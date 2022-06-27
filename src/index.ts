@@ -1,8 +1,8 @@
 import {MessagesQueue} from "./MessagesQueue";
-import {TransactionHandler} from "./TransactionHandler";
+import {ProviderFabric} from "./ProviderFabric";
 
 const messageQueue = new MessagesQueue();
-const transactionHandler = new TransactionHandler(messageQueue);
+const providerFabric = new ProviderFabric(messageQueue);
 
 window.MQ = messageQueue;
-window.transactionHandler = transactionHandler;
+window.ProviderFabric = providerFabric;

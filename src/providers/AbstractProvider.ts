@@ -1,26 +1,19 @@
 import Web3 from "web3";
-import {IMessagesQueue} from "./MessagesQueue";
-import {DataSignaturePropsDTO, IEthereumChain, TransactionData} from "./interfaces";
-import detectEthereumProvider from '@metamask/detect-provider';
-import {ExternalMethod} from "./ExternalMethodDecorator";
+import {IMessagesQueue} from "../MessagesQueue";
+import {DataSignaturePropsDTO, IEthereumChain, TransactionData} from "../interfaces";
+import {ExternalMethod} from "../ExternalMethodDecorator";
 
-const CHAIN_HAS_NOT_BEEN_ADDED_CODE = 4902;
-
-export class TransactionHandler {
-  private web3: Web3;
-  private provider: any;
-  private mq: IMessagesQueue;
+export class AbstractProvider {
+  protected web3: Web3;
+  protected provider: any;
+  protected mq: IMessagesQueue;
 
   constructor(messageQueue: IMessagesQueue) {
-    detectEthereumProvider()
-      .then((provider: any) => {
-        this.web3 = new Web3(provider);
-        this.provider = provider;
-      })
-      .catch(() => {
-        throw new Error("There is no any providers. Please install the Metamask plugin to your browser.");
-      });
     this.mq = messageQueue;
+  }
+
+  public async connect() {
+
   }
 
   @ExternalMethod()
@@ -66,7 +59,11 @@ export class TransactionHandler {
   }
 
   @ExternalMethod()
-  public async getAccounts(id: string) {
+  public async getAccounts() {
+    return this.getAccountsInternal();
+  }
+
+  public async getAccountsInternal() {
     const request = this.provider.selectedAddress ? 'eth_accounts' : 'eth_requestAccounts';
     return await this.provider.request({method: request});
   }
@@ -93,29 +90,6 @@ export class TransactionHandler {
 
   @ExternalMethod()
   public async switchChain(payload: IEthereumChain) {
-    return new Promise<void>(async (resolve, reject) => {
-      try {
-        await this.provider.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{chainId: payload.chainId}],
-        });
-        resolve();
-      } catch (switchError) {
-        if ((switchError as any).code === CHAIN_HAS_NOT_BEEN_ADDED_CODE) {
-          try {
-            await this.provider.request({
-              method: 'wallet_addEthereumChain',
-              params: [payload],
-            });
-            resolve();
-          } catch (addError) {
-            reject((addError as Error).message);
-          }
-        } else {
-          reject((switchError as Error).message);
-        }
-      }
-    });
   }
 
   @ExternalMethod()

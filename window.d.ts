@@ -1,10 +1,13 @@
 import {IMessagesQueue} from "./src/MessagesQueue";
-import {TransactionHandler} from "./src/TransactionHandler";
+import {ProviderFabric} from "./src/ProviderFabric";
+import {AbstractProvider} from "./src/providers/AbstractProvider";
 
 declare global {
   interface Window {
     ethereum: any;
+    clover: any;
     MQ: IMessagesQueue;
-    transactionHandler: TransactionHandler
+    WalletProvider: AbstractProvider;
+    ProviderFabric: ProviderFabric;
   }
 }

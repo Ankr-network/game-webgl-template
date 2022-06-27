@@ -16,7 +16,10 @@ export interface DataSignaturePropsDTO {
   password?: string;
 }
 
-// https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain
+export interface IConnectionProps {
+  wallet: string;
+  chain: IEthereumChain;
+}
 
 export interface IEthereumChain {
   chainId: string; // A 0x-prefixed hexadecimal string
