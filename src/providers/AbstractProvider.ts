@@ -2,6 +2,7 @@ import Web3 from "web3";
 import {IMessagesQueue} from "../MessagesQueue";
 import {DataSignaturePropsDTO, IEthereumChain, TransactionData} from "../interfaces";
 import {ExternalMethod} from "../ExternalMethodDecorator";
+import {GetMethodByPath} from "../utils/Functions";
 
 export class AbstractProvider {
   protected web3: Web3;
@@ -95,6 +96,15 @@ export class AbstractProvider {
   @ExternalMethod()
   public async getEvents(payload: any) {
     return await this.provider.request({method: "eth_getLogs", params: [payload]});
+  }
+
+  @ExternalMethod()
+  public async callMethod(payload: any) {
+    const {path: methodPath, args} = payload;
+    const funct = GetMethodByPath(this.web3, methodPath);
+    return {
+      result: await funct.apply(this, args)
+    };
   }
 
   private getReceipt(transactionHash: string) {

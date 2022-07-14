@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import {IConnectionProps, IEthereumChain} from "../interfaces";
+import {IEthereumChain} from "../interfaces";
 import {ExternalMethod} from "../ExternalMethodDecorator";
 import Torus from "@toruslabs/torus-embed";
 import {TorusHosts} from "../TorusHosts";
