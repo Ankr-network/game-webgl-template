@@ -107,6 +107,19 @@ export class AbstractProvider {
     };
   }
 
+  @ExternalMethod()
+  public async getChainId() {
+    const chainId = await this.provider.request({method: "eth_chainId"});
+    return {result: chainId};
+  }
+
+  @ExternalMethod()
+  public async isConnected() {
+    const accounts = await this.web3.eth.getAccounts();
+    const isConnected = accounts.length > 0;
+    return {result: isConnected};
+  }
+
   private getReceipt(transactionHash: string) {
     return this.provider.request({method: "eth_getTransactionReceipt", params: [transactionHash]});
   }

@@ -5,6 +5,7 @@ import {MetamaskProvider} from "./providers/MetamaskProvider";
 import {TorusProvider} from "./providers/TorusProvider";
 import {ExternalMethod} from "./ExternalMethodDecorator";
 import {AbstractProvider} from "./providers/AbstractProvider";
+import connectors from "./connectors";
 
 export class ProviderFabric {
   private mq: IMessagesQueue;
@@ -31,6 +32,15 @@ export class ProviderFabric {
       await provider.connect();
       this.injectProvider(provider);
     }
+  }
+
+  @ExternalMethod()
+  public async getWalletsStatus() {
+    return Object.keys(connectors).reduce(async (previousPromise, key) => {
+      const connector = connectors[key];
+      const isConnected = await connector.call(this);
+      return {... await previousPromise , [key]: isConnected};
+    }, Promise.resolve({}));
   }
 
   private injectProvider(provider: AbstractProvider) {
