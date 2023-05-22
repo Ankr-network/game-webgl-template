@@ -20,6 +20,21 @@ export class MetamaskProvider extends AbstractProvider {
   }
 
   @ExternalMethod()
+  public async addChain(payload: IEthereumChain) {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+          await this.provider.request({
+            method: 'wallet_addEthereumChain',
+            params: [payload],
+          });
+          resolve();
+      } catch (addError) {
+        reject((addError as Error).message);
+      }
+    });
+  }
+
+  @ExternalMethod()
   public async switchChain(payload: IEthereumChain) {
     return new Promise<void>(async (resolve, reject) => {
       try {
